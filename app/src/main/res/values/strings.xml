@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">Licence App</string>
+
+    <string-array name="select_category">
+        <item>Random Question</item>
+        <item>Geography</item>
+        <item>History</item>
+        <item>Technology</item>
+        <item>Science</item>
+    </string-array>
+
+    <string-array name="category_description">
+        <item>This is random description.</item>
+        <item>This is random Geography description.</item>
+        <item>This is random History description.</item>
+        <item>This is random Technology description.</item>
+        <item>This is random Science description.</item>
+    </string-array>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+</resources>

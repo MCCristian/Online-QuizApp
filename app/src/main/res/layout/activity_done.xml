@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_background"
+    tools:context=".Done">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_margin="30dp"
+        android:padding="20dp">
+
+        <LinearLayout
+            android:id="@+id/btn_group"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/text_total_score"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Score: 0"
+                android:textSize="30sp"
+                android:textColor="@android:color/white"/>
+
+            <TextView
+                android:id="@+id/text_total_question"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Passed: 0/30"
+                android:textSize="30sp"
+                android:textColor="@android:color/white"/>
+
+            <ProgressBar
+                android:id="@+id/done_progress_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                android:layout_marginTop="10dp"/>
+
+            <Button
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:id="@+id/btn_try_again"
+                android:layout_margin="8dp"
+                android:background="#CF138A"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:text="TRY AGAIN"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>
