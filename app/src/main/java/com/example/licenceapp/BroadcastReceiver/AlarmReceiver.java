@@ -39,6 +39,5 @@ public class AlarmReceiver extends BroadcastReceiver {
                 .setVibrate(new long[]{1000, 1000, 1000, 1000, 1000});
         notificationManager.notify(0, builder.build());
     }
-
-
+    
 }

@@ -6,8 +6,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -65,8 +68,9 @@ public class MainActivity extends AppCompatActivity {
                 singIn(edtUsername.getText().toString(), edtPassword.getText().toString());
             }
         });
-
-
+        
+        checkNetworkConnection();
+        
     }
 
     private void registerAlarm() {
@@ -80,8 +84,7 @@ public class MainActivity extends AppCompatActivity {
         AlarmManager am = (AlarmManager)this.getSystemService(this.ALARM_SERVICE);
         am.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
     }
-
-
+    
     private void singIn(String username, String password) {
         users.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -178,5 +181,20 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         alertDialog.show();
+    }
+    
+    private void checkNetworkConnection()
+    {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        
+        if(networkInfo != null)
+        {
+            Toast.makeText(this, "Internet Connection", Toast.LENGTH_SHORT).show();
+        }
+        else
+        {
+            Toast.makeText(this, "Not Internet Connection", Toast.LENGTH_SHORT).show();
+        }
     }
 }
