@@ -4,8 +4,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -18,16 +16,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.example.licenceapp.BroadcastReceiver.AlarmReceiver;
 import com.example.licenceapp.Common.Common;
 import com.example.licenceapp.Model.User;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
-import java.util.Calendar;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 public class MainActivity extends AppCompatActivity {
     FirebaseDatabase database;
@@ -41,8 +39,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        registerAlarm();
 
         database = FirebaseDatabase.getInstance();
         users = database.getReference("User");
@@ -68,61 +64,60 @@ public class MainActivity extends AppCompatActivity {
                 singIn(edtUsername.getText().toString(), edtPassword.getText().toString());
             }
         });
-        
-        checkNetworkConnection();
-        
+
+        FirebaseMessaging.getInstance().subscribeToTopic("dailyNotification")
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        String msg = getString(R.string.msg_subscribed);
+                        if (!task.isSuccessful()) {
+                            msg = getString(R.string.msg_subscribe_failed);
+                        }
+                    }
+                });
+
     }
 
-    private void registerAlarm() {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 3);
-        calendar.set(Calendar.MINUTE, 15);
-        calendar.set(Calendar.SECOND, 0);
-
-        Intent intent = new Intent(MainActivity.this, AlarmReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        AlarmManager am = (AlarmManager)this.getSystemService(this.ALARM_SERVICE);
-        am.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
-    }
-    
     private void singIn(String username, String password) {
-        users.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.child(username).exists())
-                {
-                    if(!username.isEmpty())
-                    {
-                        User login = snapshot.child(username).getValue(User.class);
-                        if(login.getPassword().equals(password))
-                        {
-                            Toast.makeText(MainActivity.this, "Login OK", Toast.LENGTH_SHORT).show();
-                            Intent intentCategories = new Intent(MainActivity.this, Home.class);
-                            Common.currentUser = login;
-                            startActivity(intentCategories);
-                            finish();
-                        }
-                        else
-                        {
-                            Toast.makeText(MainActivity.this, "Wrong password", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                    else
-                    {
-                        Toast.makeText(MainActivity.this, "Please enter your user name", Toast.LENGTH_SHORT).show();
-                    }
-                }
-                else
-                {
-                    Toast.makeText(MainActivity.this, "User is not exists!", Toast.LENGTH_SHORT).show();
-                }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+        if (checkNetworkConnection())
+        {
+            users.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if(snapshot.child(username).exists())
+                    {
+                        if(!username.isEmpty())
+                        {
+                            User login = snapshot.child(username).getValue(User.class);
+                            if(login.getPassword().equals(password))
+                            {
+                                Toast.makeText(MainActivity.this, "Successfully Login", Toast.LENGTH_SHORT).show();
+                                Intent intentCategories = new Intent(MainActivity.this, Home.class);
+                                Common.currentUser = login;
+                                startActivity(intentCategories);
+                                finish();
+                            }
+                            else { Toast.makeText(MainActivity.this, "Wrong password", Toast.LENGTH_SHORT).show(); }
+                        }
+                        else { Toast.makeText(MainActivity.this, "Please enter your user name", Toast.LENGTH_SHORT).show(); }
+                    }
+                    else { Toast.makeText(MainActivity.this, "User is not exists!", Toast.LENGTH_SHORT).show(); }
+                }
 
-            }
-        });
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+        }
+        else
+        {
+            Toast.makeText(this, "No Internet Connection", Toast.LENGTH_SHORT).show();
+        }
+
+
+
     }
 
     public void showSingUpDialog()
@@ -183,18 +178,19 @@ public class MainActivity extends AppCompatActivity {
         alertDialog.show();
     }
     
-    private void checkNetworkConnection()
+    private boolean checkNetworkConnection()
     {
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-        
+
         if(networkInfo != null)
         {
-            Toast.makeText(this, "Internet Connection", Toast.LENGTH_SHORT).show();
+            return true;
         }
         else
         {
             Toast.makeText(this, "Not Internet Connection", Toast.LENGTH_SHORT).show();
+            return false;
         }
     }
 }
