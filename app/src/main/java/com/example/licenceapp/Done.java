@@ -66,11 +66,11 @@ public class Done extends AppCompatActivity {
             progressBar.setProgress(correctAnswer);
 
             //Upload point in DB
-            question_score.child(String.format("%s_%s", Common.currentUser.getUserName(),
+            question_score.child(String.format("%s_%s", Common.currentUserRegister.getUsernameRegister(),
                                                                 Common.categoryId))
-                    .setValue(new QuestionScore(String.format("%s_%s", Common.currentUser.getUserName(),
+                    .setValue(new QuestionScore(String.format("%s_%s", Common.currentUserRegister.getUsernameRegister(),
                             Common.categoryId),
-                            Common.currentUser.getUserName(),
+                            Common.currentUserRegister.getUsernameRegister(),
                             String.valueOf(score),
                             Common.categoryId,
                             Common.categoryName));

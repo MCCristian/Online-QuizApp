@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.example.licenceapp.Common.Common;
 import com.example.licenceapp.Model.User;
+import com.example.licenceapp.Model.UserRegister;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
@@ -31,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
     FirebaseDatabase database;
     DatabaseReference users;
 
-    Button btnSingIn, btnSingUp, btnConfirm;
+    Button btnSingIn, btnSingUp, btnRegister;
     EditText edtUsername, edtPassword;
     EditText edtNewUsername, edtNewEmail, edtNewPassword;
 
@@ -41,27 +42,27 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         database = FirebaseDatabase.getInstance();
-        users = database.getReference("User");
+        users = database.getReference("UserRegister");
 
         edtUsername = (EditText) findViewById(R.id.edtUsername);
         edtPassword = (EditText) findViewById(R.id.edtPassword);
 
         btnSingIn = (Button)findViewById(R.id.btn_sing_in);
-        btnSingUp = (Button)findViewById(R.id.btn_sing_up);
+        btnRegister = findViewById(R.id.btn_register);
 
-        //btnConfirm = (Button)findViewById(R.id.btn_confirm);
-
-        btnSingUp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showSingUpDialog();
-            }
-        });
 
         btnSingIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 singIn(edtUsername.getText().toString(), edtPassword.getText().toString());
+            }
+        });
+
+        btnRegister.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, Register.class);
+                startActivity(intent);
             }
         });
 
@@ -80,29 +81,28 @@ public class MainActivity extends AppCompatActivity {
 
     private void singIn(String username, String password) {
 
-        if (checkNetworkConnection())
-        {
+        if (checkNetworkConnection()) {
             users.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if(snapshot.child(username).exists())
-                    {
-                        if(!username.isEmpty())
-                        {
-                            User login = snapshot.child(username).getValue(User.class);
-                            if(login.getPassword().equals(password))
-                            {
+                    if (snapshot.child(username).exists()) {
+                        if (!username.isEmpty()) {
+                            UserRegister login = snapshot.child(username).getValue(UserRegister.class);
+                            if (login.getUsernameRegister().equals(password)) {
                                 Toast.makeText(MainActivity.this, "Successfully Login", Toast.LENGTH_SHORT).show();
                                 Intent intentCategories = new Intent(MainActivity.this, Home.class);
-                                Common.currentUser = login;
+                                Common.currentUserRegister = login;
                                 startActivity(intentCategories);
                                 finish();
+                            } else {
+                                Toast.makeText(MainActivity.this, "Wrong password", Toast.LENGTH_SHORT).show();
                             }
-                            else { Toast.makeText(MainActivity.this, "Wrong password", Toast.LENGTH_SHORT).show(); }
+                        } else {
+                            Toast.makeText(MainActivity.this, "Please enter your user name", Toast.LENGTH_SHORT).show();
                         }
-                        else { Toast.makeText(MainActivity.this, "Please enter your user name", Toast.LENGTH_SHORT).show(); }
+                    } else {
+                        Toast.makeText(MainActivity.this, "User is not exists!", Toast.LENGTH_SHORT).show();
                     }
-                    else { Toast.makeText(MainActivity.this, "User is not exists!", Toast.LENGTH_SHORT).show(); }
                 }
 
                 @Override
@@ -110,74 +110,12 @@ public class MainActivity extends AppCompatActivity {
 
                 }
             });
-        }
-        else
-        {
-            Toast.makeText(this, "No Internet Connection", Toast.LENGTH_SHORT).show();
-        }
+        } else
+            {
 
-
-
+            }
     }
 
-    public void showSingUpDialog()
-    {
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
-        alertDialog.setTitle("Sign Up");
-        alertDialog.setMessage("Please fill full information");
-
-        LayoutInflater inflater = this.getLayoutInflater();
-        View sing_up_layout = inflater.inflate(R.layout.sing_up_layout, null);
-
-        edtNewUsername = (EditText)sing_up_layout.findViewById(R.id.edtNewUserName);
-        edtNewEmail= (EditText)sing_up_layout.findViewById(R.id.edtNewEmail);
-        edtNewPassword = (EditText)sing_up_layout.findViewById(R.id.edtNewPassword);
-
-
-        alertDialog.setView(sing_up_layout);
-        alertDialog.setIcon(R.drawable.ic_baseline_account_circle_24);
-
-        // Specifying a listener allows you to take an action before dismissing the dialog.
-        // The dialog is automatically dismissed when a dialog button is clicked.
-        alertDialog.setNegativeButton("NO", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-
-        alertDialog.setPositiveButton("YES", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                final User user = new User(edtNewUsername.getText().toString(),
-                        edtNewPassword.getText().toString(),
-                        edtNewEmail.getText().toString());
-
-                users.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if(snapshot.child(user.getUserName()).exists())
-                        {
-                            Toast.makeText(MainActivity.this, "User already exists!", Toast.LENGTH_SHORT).show();
-                        }
-                        else
-                        {
-                            users.child(user.getUserName()).setValue(user);
-                            Toast.makeText(MainActivity.this, "User registration success", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                });
-                dialog.dismiss();
-            }
-        });
-        alertDialog.show();
-    }
-    
     private boolean checkNetworkConnection()
     {
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -193,4 +131,109 @@ public class MainActivity extends AppCompatActivity {
             return false;
         }
     }
+
+
+
+
+
+
+    //================================Fist method for SingIn======================================
+//    private void singIn(String username, String password) {
+//
+//        if (checkNetworkConnection())
+//        {
+//            users.addListenerForSingleValueEvent(new ValueEventListener() {
+//                @Override
+//                public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                    if(snapshot.child(username).exists())
+//                    {
+//                        if(!username.isEmpty())
+//                        {
+//                            User login = snapshot.child(username).getValue(User.class);
+//                            if(login.getPassword().equals(password))
+//                            {
+//                                Toast.makeText(MainActivity.this, "Successfully Login", Toast.LENGTH_SHORT).show();
+//                                Intent intentCategories = new Intent(MainActivity.this, Home.class);
+//                                Common.currentUser = login;
+//                                startActivity(intentCategories);
+//                                finish();
+//                            }
+//                            else { Toast.makeText(MainActivity.this, "Wrong password", Toast.LENGTH_SHORT).show(); }
+//                        }
+//                        else { Toast.makeText(MainActivity.this, "Please enter your user name", Toast.LENGTH_SHORT).show(); }
+//                    }
+//                    else { Toast.makeText(MainActivity.this, "User is not exists!", Toast.LENGTH_SHORT).show(); }
+//                }
+//
+//                @Override
+//                public void onCancelled(@NonNull DatabaseError error) {
+//
+//                }
+//            });
+//        }
+//        else
+//        {
+//            Toast.makeText(this, "No Internet Connection", Toast.LENGTH_SHORT).show();
+//        }
+
+//    }
+    //================================Fist method for SingUp======================================
+//    public void showSingUpDialog()
+//    {
+//        AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
+//        alertDialog.setTitle("Sign Up");
+//        alertDialog.setMessage("Please fill full information");
+//
+//        LayoutInflater inflater = this.getLayoutInflater();
+//        View sing_up_layout = inflater.inflate(R.layout.sing_up_layout, null);
+//
+//        edtNewUsername = (EditText)sing_up_layout.findViewById(R.id.edtNewUserName);
+//        edtNewEmail= (EditText)sing_up_layout.findViewById(R.id.edtNewEmail);
+//        edtNewPassword = (EditText)sing_up_layout.findViewById(R.id.edtNewPassword);
+//
+//
+//        alertDialog.setView(sing_up_layout);
+//        alertDialog.setIcon(R.drawable.ic_baseline_account_circle_24);
+//
+//        // Specifying a listener allows you to take an action before dismissing the dialog.
+//        // The dialog is automatically dismissed when a dialog button is clicked.
+//        alertDialog.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//                dialog.dismiss();
+//            }
+//        });
+//
+//        alertDialog.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//                final User user = new User(edtNewUsername.getText().toString(),
+//                        edtNewPassword.getText().toString(),
+//                        edtNewEmail.getText().toString());
+//
+//                users.addListenerForSingleValueEvent(new ValueEventListener() {
+//                    @Override
+//                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                        if(snapshot.child(user.getUserName()).exists())
+//                        {
+//                            Toast.makeText(MainActivity.this, "User already exists!", Toast.LENGTH_SHORT).show();
+//                        }
+//                        else
+//                        {
+//                            users.child(user.getUserName()).setValue(user);
+//                            Toast.makeText(MainActivity.this, "User registration success", Toast.LENGTH_SHORT).show();
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onCancelled(@NonNull DatabaseError error) {
+//
+//                    }
+//                });
+//                dialog.dismiss();
+//            }
+//        });
+//        alertDialog.show();
+
+//    }
 }

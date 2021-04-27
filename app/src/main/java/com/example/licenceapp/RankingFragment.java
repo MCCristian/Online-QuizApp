@@ -69,7 +69,7 @@ public class RankingFragment extends Fragment {
         layoutManager.setStackFromEnd(true);
         rankingList.setLayoutManager(layoutManager);
 
-        updateScore(Common.currentUser.getUserName(), new RankingCallBack<Ranking>() {
+        updateScore(Common.currentUserRegister.getUsernameRegister(), new RankingCallBack<Ranking>() {
             @Override
             public void callBack(Ranking ranking) {
                 rankingTbl.child(ranking.getUserName())
