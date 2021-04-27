@@ -33,17 +33,6 @@
         app:layout_constraintTop_toBottomOf="@+id/edtUsername"
         app:layout_constraintVertical_bias="0.05" />
 
-    <Button
-        android:id="@+id/btn_sing_up"
-        android:layout_width="153dp"
-        android:layout_height="56dp"
-        android:layout_marginBottom="344dp"
-        android:text="Sing Up1"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edtPassword"
-        app:layout_constraintVertical_bias="0.203" />
 
     <Button
         android:id="@+id/btn_sing_in"
@@ -54,14 +43,14 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn_sing_up"
+        app:layout_constraintTop_toBottomOf="@+id/edtPassword"
         app:layout_constraintVertical_bias="0.105" />
 
     <Button
-        android:id="@+id/btn_sing_up2"
+        android:id="@+id/btn_register"
         android:layout_width="153dp"
         android:layout_height="56dp"
-        android:text="Sing Up2"
+        android:text="Register"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
